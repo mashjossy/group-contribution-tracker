@@ -1,4 +1,6 @@
-# Never upload these
 backend/node_modules
-frontend/node_modules
 backend/.env
+backend/.vs
+backend/test.js
+frontend/node_modules
+frontend/.git
