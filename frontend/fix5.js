@@ -1,4 +1,6 @@
+const fs = require('fs');
 
+fs.writeFileSync('src/pages/GroupDetail.js', `
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { PieChart, Pie, Cell, Legend, Tooltip } from 'recharts';
@@ -195,3 +197,5 @@ export default function GroupDetail() {
     </div>
   );
 }
+`);
+console.log('Fixed!');

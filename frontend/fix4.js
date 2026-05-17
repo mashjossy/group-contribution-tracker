@@ -1,4 +1,6 @@
+const fs = require('fs');
 
+fs.writeFileSync('src/pages/GroupDetail.js', `
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { PieChart, Pie, Cell, Legend, Tooltip } from 'recharts';
@@ -19,20 +21,11 @@ export default function GroupDetail() {
   const [summary, setSummary] = useState({});
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
-  const [isAdmin, setIsAdmin] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState(MONTHS[new Date().getMonth()]);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
-    api.get('/groups/' + id).then(r => {
-      setGroup(r.data);
-      const loggedInUser = JSON.parse(localStorage.getItem('user'));
-      const adminCheck = parseInt(r.data.admin_id) === parseInt(loggedInUser.id);
-      setIsAdmin(adminCheck);
-      console.log('admin_id from DB:', r.data.admin_id);
-      console.log('logged in user id:', loggedInUser.id);
-      console.log('isAdmin result:', adminCheck);
-    });
+    api.get('/groups/' + id).then(r => setGroup(r.data));
     api.get('/members/' + id).then(r => setMembers(r.data));
     api.get('/contributions/' + id + '/summary').then(r => setSummary(r.data));
   }, [id]);
@@ -56,6 +49,11 @@ export default function GroupDetail() {
     }
   };
 
+  // ── ADMIN CHECK ──────────────────────────────────────────────────────────
+  // Compare logged-in user ID with the group's admin_id
+  // Only the group creator sees management buttons
+  const isAdmin = group && user && Number(group.admin_id) === Number(user.id);
+
   const paidCount = status.filter(s => s.status === 'paid').length;
   const unpaidCount = status.filter(s => s.status === 'unpaid').length;
   const pieData = [
@@ -75,7 +73,7 @@ export default function GroupDetail() {
       <div style={{background:'#1F4E79',borderRadius:12,padding:24,marginBottom:24,color:'#fff'}}>
         <h2 style={{marginBottom:4}}>{group.name}</h2>
         <p style={{opacity:0.8}}>{group.description || 'No description'}</p>
-        <p style={{opacity:0.7,fontSize:13,marginTop:8}}>
+        <p style={{opacity:0.7, fontSize:13, marginTop:8}}>
           {isAdmin ? '👑 You are the Admin of this group' : '👤 You are a Member of this group'}
         </p>
       </div>
@@ -102,6 +100,7 @@ export default function GroupDetail() {
           {[2024,2025,2026,2027].map(y => <option key={y}>{y}</option>)}
         </select>
 
+        {/* ONLY ADMIN CAN LOG PAYMENTS */}
         {isAdmin && (
           <button onClick={() => navigate('/group/' + id + '/contribute')} style={{background:'#1F4E79',color:'#fff',border:'none',padding:'10px 18px',borderRadius:8,cursor:'pointer',fontSize:14,fontWeight:'bold'}}>
             + Log Payment
@@ -157,6 +156,7 @@ export default function GroupDetail() {
         </div>
       </div>
 
+      {/* ONLY ADMIN CAN ADD MEMBERS */}
       {isAdmin && (
         <div style={{background:'#f0f4f8',borderRadius:10,padding:20,marginBottom:24}}>
           <h3 style={{color:'#1F4E79',marginBottom:12}}>Add a Member by Email</h3>
@@ -195,3 +195,6 @@ export default function GroupDetail() {
     </div>
   );
 }
+`);
+
+console.log('GroupDetail.js fixed successfully!');
