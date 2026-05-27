@@ -1,0 +1,26 @@
+const fs = require('fs');
+
+// Create a render.yaml file for deployment
+fs.writeFileSync('render.yaml', `services:
+  - type: web
+    name: contribution-tracker-api
+    runtime: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: DB_HOST
+        value: db.zactnhgajejyapfqiodo.supabase.co
+      - key: DB_USER
+        value: postgres
+      - key: DB_PASSWORD
+        value: postgres123
+      - key: DB_NAME
+        value: postgres
+      - key: DB_PORT
+        value: 5432
+      - key: JWT_SECRET
+        value: myjwtS3cr3tK3yM@chak0s2024
+      - key: PORT
+        value: 5000
+`);
+console.log('render.yaml created!');
